@@ -9,6 +9,7 @@ Object.defineProperties( Object.prototype, {
         },
         enumerable: false
     },
+
     filter: {
         /**
          * @param {string|number|Function|RegExp} needle
@@ -19,6 +20,7 @@ Object.defineProperties( Object.prototype, {
         },
         enumerable: false
     },
+
     flatFilter: {
         /**
          * @param {string|number|Function|RegExp} needle
@@ -26,6 +28,16 @@ Object.defineProperties( Object.prototype, {
          */
         value: function( needle, depth ){
             return flatFilter( this, needle, depth );
+        },
+        enumerable: false
+    },
+
+    getByPath: {
+        /**
+         * @param {string} path - dot delimited string like "some.path"
+         */
+        value: function( path ){
+            return getByPath( this, path );
         },
         enumerable: false
     }
@@ -113,7 +125,11 @@ function filter( object, needle, depth ){
  * @return Object
  */
 function flatFilter( object, needle, depth ){
-    throw 'Not Implemented';
+    var paths = find( object, needle, depth );
+    return paths.reduce( function( res, path ){
+        res[path] = getByPath( object, path );
+        return res;
+    }, {} );
 }
 
 
@@ -203,4 +219,22 @@ function isObject( val ){
 
 function isArray( val ){
     return val instanceof Array;
+}
+
+
+function getByPath( obj, path ){
+    var res = obj,
+        way = path instanceof Array ? path : path.split( '.' );
+
+    if ( !res || !isObject(res) )
+        return;
+
+    for ( var i = 0; i < way.length; i++ ){
+        if ( res.hasOwnProperty(way[i]) )
+            res = res[way[i]];
+        else
+            return;
+    }
+
+    return res;
 }

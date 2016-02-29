@@ -42,10 +42,45 @@ var assert = require( 'assert'),
     };
 
 
+testGetByPath();
 testFind();
 testFilter();
 testFlatFilter();
 console.log( 'All tests passed successfully!' );
+
+
+function testGetByPath(){
+    assert.deepEqual(
+        obj.getByPath( 'blabla' ),
+        undefined,
+        'should return undefined for unknown key'
+    );
+
+    assert.deepEqual(
+        obj.getByPath( 'obj.obj.bla.bla' ),
+        undefined,
+        'should return undefined for unknown path'
+    );
+
+    assert.deepEqual(
+        obj.getByPath( 'fn' ),
+        noop,
+        'should return value by key'
+    );
+
+    assert.deepEqual(
+        obj.getByPath( 'array.7.0' ),
+        'string',
+        'should return value by path (in arrays)'
+    );
+
+    assert.deepEqual(
+        obj.getByPath( 'obj.obj.obj.str' ),
+        'deeply hidden string',
+        'should return value by path (in array)'
+    );
+}
+
 
 function testFind(){
     assert.deepEqual(
@@ -122,5 +157,18 @@ function testFilter(){
 
 
 function testFlatFilter(){
+    assert.deepEqual(
+        obj.flatFilter( 'fn' ),
+        {'fn': noop, 'obj.fn': noop}
+    );
 
+    assert.deepEqual(
+        obj.flatFilter( 'string' ),
+        {
+            str: 'this is string',
+            'array.7.0': 'string',
+            'array.8.some': 'string',
+            'obj.str': 'this is string'
+        }
+    );
 }
