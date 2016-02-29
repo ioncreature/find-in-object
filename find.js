@@ -101,27 +101,19 @@ function filter( object, needle, depth ){
         copy( object, result, path );
     });
 
-    return object;
+    return result;
 }
 
 
 /**
  * Finds needle string recursively in keys and values, returns Object like {'some.path': 'value'}
- * It's useful to find some key or value in big objects when debugging in console
  * @param {Object} object
  * @param {string|Function|RegExp} needle
  * @param {number?} depth - depth of search in tree, default is 3
  * @return Object
  */
 function flatFilter( object, needle, depth ){
-    var paths = find( object, needle, depth ),
-        result = {};
-
-    paths.forEach( function( path ){
-        copy( object, result, path );
-    });
-
-    return object;
+    throw 'Not Implemented';
 }
 
 
@@ -161,7 +153,7 @@ function arrayUnique( array, compareFn ){
  */
 function copy( from, to, path ){
     if ( !isObject(to) )
-        return isArray( from ) ? [] : {};
+        return;
 
     if ( !path || path.length === 0 )
         return to;
@@ -188,7 +180,7 @@ function copy( from, to, path ){
         return to;
     }
 
-    to[key] = copy( value, undefined, splittedPath.splice(1) );
+    to[key] = copy( value, isArray(value) ? [] : {}, splittedPath.splice(1) );
     return to;
 }
 

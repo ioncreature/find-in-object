@@ -1,7 +1,8 @@
 require( './find.js' );
 var assert = require( 'assert'),
+    noop = function(){},
     array = [
-        function(){},
+        noop,
         1,
         1.5,
         true,
@@ -12,7 +13,7 @@ var assert = require( 'assert'),
         {some: 'string'}
     ],
     obj = {
-        fn: function(){},
+        fn: noop,
         str: 'this is string',
         int: 100500,
         float: 100.5,
@@ -22,7 +23,7 @@ var assert = require( 'assert'),
         undef: undefined,
         array: array,
         obj: {
-            fn: function(){},
+            fn: noop,
             str: 'this is string',
             int: 100500,
             float: 100.5,
@@ -32,7 +33,10 @@ var assert = require( 'assert'),
             undef: undefined,
             array: array,
             obj: {
-                obj: {str: 'deeply hidden string'}
+                obj: {
+                    str: 'deeply hidden string',
+                    obj: {}
+                }
             }
         }
     };
@@ -87,11 +91,33 @@ function testFind(){
         ['int', 'float', 'obj.int', 'obj.float'],
         'should find by number'
     );
+
+    assert.deepEqual(
+        obj.find( 'obj' ),
+        ['obj', 'obj.obj', 'obj.obj.obj'],
+        'should find in keys by string "obj"'
+    );
 }
 
 
 function testFilter(){
+    assert.deepEqual(
+        obj.filter( 'fn' ),
+        {fn: obj.fn, obj: {fn: noop}},
+        'should return filtered obj'
+    );
 
+    assert.deepEqual(
+        obj.filter( 'deeply hidden string' ),
+        {},
+        'should return empty obj'
+    );
+
+    assert.deepEqual(
+        obj.filter( 'deeply hidden string', 4 ),
+        {obj: {obj: {obj: {str: 'deeply hidden string'}}}},
+        'should return filtered obj'
+    );
 }
 
 
