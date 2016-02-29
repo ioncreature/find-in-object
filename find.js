@@ -1,8 +1,42 @@
+Object.defineProperties( Object.prototype, {
+    find: {
+        /**
+         * @param {string|number|Function|RegExp} needle
+         * @param {number?} depth - depth of search in tree, default is 3
+         */
+        value: function( needle, depth ){
+            return find( this, needle, depth );
+        },
+        enumerable: false
+    },
+    filter: {
+        /**
+         * @param {string|number|Function|RegExp} needle
+         * @param {number?} depth - depth of search in tree, default is 3
+         */
+        value: function( needle, depth ){
+            return filter( this, needle, depth );
+        },
+        enumerable: false
+    },
+    flatFilter: {
+        /**
+         * @param {string|number|Function|RegExp} needle
+         * @param {number?} depth - depth of search in tree, default is 3
+         */
+        value: function( needle, depth ){
+            return flatFilter( this, needle, depth );
+        },
+        enumerable: false
+    }
+});
+
+
 /**
  * Finds needle string recursively in keys and values
  * It's useful to find some key or value in big objects when debugging in console
  * @param {Object} object
- * @param {string|Function|RegExp} needle
+ * @param {string|number|Function|RegExp} needle
  * @param {number?} depth - depth of search in tree, default is 3
  * @return Array - list of paths
  */
@@ -12,7 +46,7 @@ function find( object, needle, depth ){
     else if ( typeof depth == 'undefined' )
         depth = 3;
 
-    if ( !(object instanceof Object) )
+    if ( !isObject(object) )
         return [];
 
     var keys = Object.keys( object ),
@@ -22,7 +56,7 @@ function find( object, needle, depth ){
         i,
         test;
 
-    if ( typeof needle === 'function' )
+    if ( isFunction(needle) )
         test = testFunc;
     else if ( needle instanceof RegExp )
         test = testRegExp;
@@ -52,6 +86,45 @@ function find( object, needle, depth ){
 }
 
 
+/**
+ * Finds needle string recursively in keys and values, returns filtered Object
+ * @param {Object} object
+ * @param {string|Function|RegExp} needle
+ * @param {number?} depth - depth of search in tree, default is 3
+ * @return Object
+ */
+function filter( object, needle, depth ){
+    var paths = find( object, needle, depth ),
+        result = {};
+
+    paths.forEach( function( path ){
+        copy( object, result, path );
+    });
+
+    return object;
+}
+
+
+/**
+ * Finds needle string recursively in keys and values, returns Object like {'some.path': 'value'}
+ * It's useful to find some key or value in big objects when debugging in console
+ * @param {Object} object
+ * @param {string|Function|RegExp} needle
+ * @param {number?} depth - depth of search in tree, default is 3
+ * @return Object
+ */
+function flatFilter( object, needle, depth ){
+    var paths = find( object, needle, depth ),
+        result = {};
+
+    paths.forEach( function( path ){
+        copy( object, result, path );
+    });
+
+    return object;
+}
+
+
 function testString( value, str ){
     return value.indexOf( str ) > -1;
 }
@@ -78,25 +151,6 @@ function arrayUnique( array, compareFn ){
 
         return true;
     });
-}
-
-/**
- * Finds needle string recursively in keys and values
- * It's useful to find some key or value in big objects when debugging in console
- * @param {Object} object
- * @param {string|Function|RegExp} needle
- * @param {number?} depth - depth of search in tree, default is 3
- * @return Object
- */
-function findAndFilter( object, needle, depth ){
-    var paths = find( object, needle, depth ),
-        result = {};
-
-    paths.forEach( function( path ){
-        copy( object, result, path );
-    });
-
-    return object;
 }
 
 
