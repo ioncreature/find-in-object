@@ -88,7 +88,7 @@ function find( object, needle, depth ){
             test( String(value), needle ) && searchResults.push( key );
 
         // search in value: array or object
-        else if ( typeof value == 'object' )
+        else if ( isObject(value) )
             find( value, needle, depth - 1 ).forEach( function( val ){
                 searchResults.push( key + '.' + val );
             });
